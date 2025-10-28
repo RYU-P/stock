@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import Chart from 'react-apexcharts';
 
 // Import JSON data directly
-import stockData from '../../backend/data/IBM.json';
+import stockData from '../../backend/data/AAPL.json';
 
 const StockChart = () => {
   const SYMBOL = 'AAPL';
