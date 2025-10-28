@@ -7,7 +7,7 @@ const __dirname = path.dirname(__filename);
 
 // Configuration
 const API_KEY = 'YOUR_ALPHA_VANTAGE_API_KEY';
-const SYMBOL = 'GOOGL'; // Change this to fetch different stocks
+const SYMBOL = 'VOO'; // Change this to fetch different stocks
 const DATA_DIR = path.join(__dirname, 'data');
 
 // Ensure data directory exists

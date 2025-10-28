@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react';
 import Chart from 'react-apexcharts';
 
 // Import JSON data directly
-import stockData from '../../backend/data/AAPL.json';
+import stockData from '../../backend/data/VOO.json';
 
 const StockChart = () => {
-  const SYMBOL = 'AAPL';
+  const SYMBOL = 'VOO';
   
   const [series, setSeries] = useState([{
     name: 'Stock Price',
@@ -58,8 +58,8 @@ const StockChart = () => {
     chartData.reverse();
 
     // Optional: Filter by date range
-    const startDate = new Date('2022-03-02').getTime();
-    const endDate = new Date('2022-03-08').getTime();
+    const startDate = new Date('2024-05-01').getTime();
+    const endDate = new Date('2024-06-14').getTime();
     
     const filteredData = chartData.filter(item => 
       item.x >= startDate && item.x <= endDate
