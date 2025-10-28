@@ -12,6 +12,7 @@
   "dependencies": {
     "apexcharts": "^5.3.5",
     "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "react": "^19.1.1",
     "react-apexcharts": "^1.8.0",

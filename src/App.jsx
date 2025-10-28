@@ -6,7 +6,7 @@ function App() {
       <header className="bg-linear-to-r from-blue-600 to-indigo-600 text-white shadow-lg">
         <div className="container mx-auto px-4 py-6">
           <h1 className="text-3xl font-bold">📈 Stock Chart Dashboard</h1>
-          <p className="text-blue-100 mt-2">Real-time market data visualization</p>
+          <p className="text-blue-100 mt-2">Real-time market data with local JSON caching</p>
         </div>
       </header>
       
