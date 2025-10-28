@@ -5,7 +5,7 @@ import Chart from 'react-apexcharts';
 import stockData from '../../backend/data/IBM.json';
 
 const StockChart = () => {
-  const SYMBOL = 'IBM';
+  const SYMBOL = 'AAPL';
   
   const [series, setSeries] = useState([{
     name: 'Stock Price',
