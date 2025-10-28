@@ -1,16 +1,11 @@
 import { useState, useEffect } from 'react';
 import Chart from 'react-apexcharts';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+// Import JSON data directly
+import stockData from '../../backend/data/IBM.json';
 
 const StockChart = () => {
   const SYMBOL = 'IBM';
-  
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [refreshing, setRefreshing] = useState(false);
-  const [lastUpdated, setLastUpdated] = useState(null);
-  const [fromCache, setFromCache] = useState(false);
   
   const [series, setSeries] = useState([{
     name: 'Stock Price',
@@ -39,101 +34,46 @@ const StockChart = () => {
     }
   });
 
-  // Transform data to ApexCharts format
-  const transformData = (stockData) => {
-    return stockData.map(item => ({
-      x: new Date(item.date).getTime(),
-      y: [item.open, item.high, item.low, item.close]
-    }));
-  };
-
-  // Fetch data from backend
-  const fetchData = async (forceRefresh = false) => {
-    try {
-      if (forceRefresh) {
-        setRefreshing(true);
-      } else {
-        setLoading(true);
-      }
-      setError(null);
-      
-      const startDate = '2022-03-02';
-      const endDate = '2022-03-08';
-      
-      const params = new URLSearchParams({
-        startDate,
-        endDate,
-        forceRefresh: forceRefresh.toString()
-      });
-      
-      const response = await fetch(`${API_BASE_URL}/stocks/${SYMBOL}?${params}`);
-      const result = await response.json();
-      
-      if (!result.success) {
-        throw new Error(result.error);
-      }
-      
-      const transformedData = transformData(result.data.data);
-      setSeries([{ data: transformedData }]);
-      setLastUpdated(result.data.lastUpdated);
-      setFromCache(result.data.fromCache);
-      
-      setLoading(false);
-      setRefreshing(false);
-      
-    } catch (err) {
-      console.error('Error fetching data:', err);
-      setError(err.message);
-      setLoading(false);
-      setRefreshing(false);
-    }
-  };
-
   useEffect(() => {
-    fetchData();
-  }, []);
+    // Transform the imported JSON data
+    const timeSeries = stockData["Time Series (Daily)"];
+    
+    if (!timeSeries) {
+      console.error('No time series data found');
+      return;
+    }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <div className="text-lg text-gray-600">Loading chart data...</div>
-      </div>
+    // Convert to ApexCharts format
+    const chartData = Object.entries(timeSeries).map(([date, values]) => ({
+      x: new Date(date).getTime(),
+      y: [
+        parseFloat(values["1. open"]),
+        parseFloat(values["2. high"]),
+        parseFloat(values["3. low"]),
+        parseFloat(values["4. close"])
+      ]
+    }));
+
+    // Reverse to show oldest to newest
+    chartData.reverse();
+
+    // Optional: Filter by date range
+    const startDate = new Date('2022-03-02').getTime();
+    const endDate = new Date('2022-03-08').getTime();
+    
+    const filteredData = chartData.filter(item => 
+      item.x >= startDate && item.x <= endDate
     );
-  }
-  
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center p-8 space-y-4">
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded max-w-2xl">
-          <strong className="font-bold">Error: </strong>
-          <span>{error}</span>
-        </div>
-        <button
-          onClick={() => fetchData(true)}
-          disabled={refreshing}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg disabled:opacity-50"
-        >
-          {refreshing ? 'Fetching...' : 'Try Fetching Fresh Data'}
-        </button>
-      </div>
-    );
-  }
+
+    setSeries([{ data: filteredData }]);
+  }, []);
 
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <div className="text-sm text-gray-600">
-          {fromCache && '💾 '}
-          Last updated: {new Date(lastUpdated).toLocaleString()}
-          {fromCache && ' (from cache)'}
+          📁 Data loaded from JSON file
         </div>
-        <button
-          onClick={() => fetchData(true)}
-          disabled={refreshing}
-          className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg disabled:opacity-50 transition-colors"
-        >
-          {refreshing ? '🔄 Refreshing...' : '🔄 Refresh from API'}
-        </button>
       </div>
       
       <div className="bg-white rounded-lg shadow-lg p-6">
