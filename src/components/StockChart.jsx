@@ -4,7 +4,8 @@ import Chart from 'react-apexcharts';
 // Import JSON data directly
 import stockData from '../../backend/data/NVDA.json';
 
-const StockChart = () => {
+const StockChart = (startDate, endDate
+) => {
   const SYMBOL = 'NDVA';
   
   const [series, setSeries] = useState([{
@@ -58,8 +59,8 @@ const StockChart = () => {
     chartData.reverse();
 
     // Optional: Filter by date range
-    const startDate = new Date('2018-12-01').getTime();
-    const endDate = new Date('2022-06-14').getTime();
+    const startDate = new Date(startDate).getTime();
+    const endDate = new Date(endDate).getTime();
     
     const filteredData = chartData.filter(item => 
       item.x >= startDate && item.x <= endDate
@@ -70,12 +71,6 @@ const StockChart = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <div className="text-sm text-gray-600">
-          📁 Data loaded from JSON file
-        </div>
-      </div>
-      
       <div className="bg-white rounded-lg shadow-lg p-6">
         <Chart
           options={options}
