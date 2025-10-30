@@ -4,8 +4,7 @@ import Chart from 'react-apexcharts';
 // Import JSON data directly
 import stockData from '../../backend/data/NVDA.json';
 
-const StockChart = (startDate, endDate
-) => {
+const StockChart = ({startDate, endDate}) => {
   const SYMBOL = 'NDVA';
   
   const [series, setSeries] = useState([{
@@ -17,6 +16,8 @@ const StockChart = (startDate, endDate
     chart: {
       type: 'candlestick',
       height: 450,
+      id: 'stock-price',
+      group: 'stock-charts',
       toolbar: { show: true }
     },
     title: {
@@ -35,8 +36,35 @@ const StockChart = (startDate, endDate
     }
   });
 
+  const [volumeSeries, setVolumeSeries] = useState([{
+    name: 'Volume',
+    data: []
+  }]);
+
+  const [volumeOptions] = useState({
+    chart: {
+      type: 'bar',
+      height: 250,
+      group: 'stock-charts',
+      toolbar: { show: false }
+    },
+    title: {
+      text: `${SYMBOL} Trading Volume`,
+      align: 'left',
+      style: {
+        fontSize: '16px',
+        fontWeight: 'bold'
+      }
+    },
+    xaxis: {
+      type: 'datetime'
+    },
+    yaxis: {
+      tooltip: { enabled: true }
+    }
+  });
+
   useEffect(() => {
-    // Transform the imported JSON data
     const timeSeries = stockData["Time Series (Daily)"];
     
     if (!timeSeries) {
@@ -44,7 +72,6 @@ const StockChart = (startDate, endDate
       return;
     }
 
-    // Convert to ApexCharts format
     const chartData = Object.entries(timeSeries).map(([date, values]) => ({
       x: new Date(date).getTime(),
       y: [
@@ -55,19 +82,28 @@ const StockChart = (startDate, endDate
       ]
     }));
 
-    // Reverse to show oldest to newest
-    chartData.reverse();
+    const volumeData = Object.entries(timeSeries).map(([date, values]) => ({
+      x: new Date(date).getTime(),
+      y: parseFloat(values["5. volume"])
+    }));
 
-    // Optional: Filter by date range
-    const startDate = new Date(startDate).getTime();
-    const endDate = new Date(endDate).getTime();
+    chartData.reverse();
+    volumeData.reverse();
+
+    const startDateTime = new Date(startDate).getTime();
+    const endDateTime = new Date(endDate).getTime();
     
     const filteredData = chartData.filter(item => 
-      item.x >= startDate && item.x <= endDate
+      item.x >= startDateTime && item.x <= endDateTime
+    );
+
+    const filteredVolumeData = volumeData.filter(item => 
+      item.x >= startDateTime && item.x <= endDateTime
     );
 
     setSeries([{ data: filteredData }]);
-  }, []);
+    setVolumeSeries([{ data: filteredVolumeData }]);
+  }, [startDate, endDate]);
 
   return (
     <div className="space-y-4">
@@ -77,6 +113,14 @@ const StockChart = (startDate, endDate
           series={series}
           type="candlestick"
           height={450}
+        />
+      </div>
+      <div className="bg-white rounded-lg shadow-lg p-6">
+        <Chart
+          options={volumeOptions}
+          series={volumeSeries}
+          type="bar"
+          height={250}
         />
       </div>
     </div>
